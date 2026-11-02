@@ -1,0 +1,89 @@
+# Registro de Fuentes y Datasets para la Memoria
+
+Este documento recopila las referencias formales y los textos descriptivos de los datasets utilizados para evaluar la detección de spam en dos canales: SMS y Correo Electrónico.
+
+---
+
+## 1. Dataset de SMS: SMS Spam Collection
+
+* **Canal:** Mensajería corta (SMS).
+* **Contenido:** 5.574 mensajes en inglés etiquetados como legítimos (`ham`) o spam (`spam`).
+* **Origen de los datos:** UCI Machine Learning Repository / Hugging Face (`sms_spam`).
+
+### Citas bibliográficas
+
+* **Estilo APA (7.ª edición):**
+  > Almeida, T. A., & Hidalgo, J. M. G. (2012). *SMS Spam Collection* [Conjunto de datos]. UCI Machine Learning Repository. https://doi.org/10.24432/C5CC84
+
+* **Estilo IEEE:**
+  > [1] T. A. Almeida and J. M. G. Hidalgo, "SMS Spam Collection," *UCI Machine Learning Repository*, 2012, doi: 10.24432/C5CC84.
+
+### Texto para la memoria (Sección Metodología / Datos)
+
+> «Para la evaluación de los modelos en entornos de mensajería corta, se ha utilizado el corpus público **SMS Spam Collection** (Almeida & Hidalgo, 2012), obtenido a través del repositorio oficial de aprendizaje automático de la Universidad de California en Irvine (UCI Machine Learning Repository). Este conjunto de datos reúne 5.574 mensajes en inglés etiquetados como legítimos (`ham`) o spam (`spam`), permitiendo analizar el comportamiento de las herramientas de detección ante textos breves, lenguaje informal y abreviaturas.»
+
+---
+
+## 2. Dataset de Correo Electrónico: Enron-Spam
+
+* **Canal:** Correo electrónico corporativo (Email).
+* **Contenido:** Correos electrónicos de la empresa Enron junto a mensajes no deseados, con asuntos y cuerpos extensos.
+* **Origen de los datos:** AUEB (Metsis et al., 2006) / Hugging Face (`SetFit/enron_spam`).
+
+### Citas bibliográficas
+
+* **Estilo APA (7.ª edición):**
+  > Metsis, V., Androutsopoulos, I., & Paliouras, G. (2006). Spam filtering with Naive Bayes—Which Naive Bayes? En *CEAS 2006 - Third Conference on Email and Anti-Spam*. http://dx.doi.org/10.1145/1014052.1014073
+
+* **Estilo IEEE:**
+  > [2] V. Metsis, I. Androutsopoulos, and G. Paliouras, "Spam filtering with Naive Bayes—Which Naive Bayes?," in *CEAS 2006 - Third Conference on Email and Anti-Spam*, Mountain View, CA, 2006.
+
+### Texto para la memoria (Sección Metodología / Datos)
+
+> «Para analizar la detección de spam en correo electrónico, se ha empleado el corpus de referencia **Enron-Spam** (Metsis et al., 2006), distribuido y procesado a través del repositorio de Hugging Face (`SetFit/enron_spam`). Esta colección combina correos reales generados en el entorno corporativo de Enron con mensajes publicitarios y fraudulentos etiquetados, facilitando la evaluación de las IAs frente a textos de mayor longitud y estructura formal (asuntos, encabezados y firmas).»
+
+
+
+
+
+# 3. Metodología y Preparación del Dataset de Pruebas
+
+Para evaluar de forma cuantitativa la eficacia de diferentes modelos de Inteligencia Artificial en la detección de spam, se ha implementado un script en Python (`requests`, `pandas`, `zipfile`) que descarga de forma automatizada los datos originales, los normaliza y genera una muestra experimental equilibrada.
+
+---
+
+## 3.1. Procedencia y Descarga de los Datos
+
+La adquisición de datos se realizó directamente desde las fuentes públicas mediante peticiones HTTP:
+
+1. **SMS Spam Collection (Canal SMS):**
+   * **Fuente:** Repositorio oficial UCI Machine Learning Repository (Almeida & Hidalgo, 2012).
+   * **Mecanismo:** Descarga del archivo comprimido original (`sms+spam+collection.zip`), extracción en memoria del archivo tabular `SMSSpamCollection` y carga en memoria estructurada.
+   * **Copia local:** Almacenado íntegro en `sms_spam_original_completo.csv`.
+
+2. **Enron-Spam Dataset (Canal Email):**
+   * **Fuente:** Corpus Enron-Spam (Metsis et al., 2006), alojado en Hugging Face (`SetFit/enron_spam`).
+   * **Mecanismo:** Descarga directa del archivo de datos en formato JSONL (`train.jsonl`) y conversión a estructura tabular.
+   * **Copia local:** Almacenado íntegro en `enron_spam_original_completo.csv`.
+
+---
+
+## 3.2. Estandarización y Procesamiento
+
+Ambos conjuntos de datos fueron procesados para unificar su esquema:
+* **Estandarización de etiquetas:** Conversión de las clases a las categorías nominales `HAM` (legítimo) y `SPAM` (correo no deseado).
+* **Atributo de canal:** Incorporación de la columna `canal` con los valores `SMS` o `EMAIL` para permitir métricas comparativas segmentadas por formato.
+
+---
+
+## 3.3. Construcción de la Muestra Experimental (`dataset_pruebas_200.csv`)
+
+A partir de los datos originales, se construyó un dataset de prueba estratificado de **200 observaciones** con balance exacto:
+
+* **Estratificación por formato y clase (50 muestras por subgrupo):**
+  * **SMS Legítimos (HAM):** 50 mensajes.
+  * **SMS Spam (SPAM):** 50 mensajes.
+  * **Email Legítimos (HAM):** 50 correos.
+  * **Email Spam (SPAM):** 50 correos.
+* **Control de sesgo y reproducibilidad:** Extracción y mezcla aleatoria fijadas mediante semilla pseudoaleatoria (`random_state=42`), garantizando la repetibilidad exacta del experimento.
+* **Estructura final:** Identificador unívoco secuencial (`id` del 1 al 200), columna de canal, etiqueta real de referencia y texto (`[id, canal, etiqueta, texto]`), exportado en `dataset_pruebas_200.csv`.

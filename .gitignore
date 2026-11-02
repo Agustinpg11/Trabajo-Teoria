@@ -1,0 +1,15 @@
+# Entorno virtual
+.venv/
+env/
+venv/
+
+# Archivos pesados o datasets grandes
+Dataset/enron_spam_original_completo.csv
+Dataset/sms_spam_original_completo.csv
+Dataset/dataset_pruebas_200.csv
+
+# Temporales de Python y del sistema
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.DS_Store
